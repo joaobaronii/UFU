@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="Fig26_04-05"/>
+	<classpathentry kind="src" path="Fig26_06"/>
+	<classpathentry kind="src" path="Fig26_07-09"/>
+	<classpathentry kind="src" path="Fig26_10"/>
+	<classpathentry kind="src" path="Fig26_11-15"/>
+	<classpathentry kind="src" path="Fig26_16-17"/>
+	<classpathentry kind="src" path="Fig26_18-19"/>
+	<classpathentry kind="src" path="Fig26_20-21"/>
+	<classpathentry kind="src" path="Fig26_22-23"/>
+	<classpathentry kind="src" path="Fig26_25-26"/>
+	<classpathentry kind="src" path="Fig26_27-28"/>
+	<classpathentry kind="src" path="redes"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
