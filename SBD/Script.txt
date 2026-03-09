@@ -1,0 +1,304 @@
+CREATE TABLE Premio (
+    codigo_premio SMALLINT,
+    tipo VARCHAR(50) NOT NULL,
+    data_entrega DATE,
+    CONSTRAINT pk_premio PRIMARY KEY (codigo_premio)
+);
+
+
+CREATE TABLE Desconto (
+    codigo_desconto SMALLINT,
+    valor NUMERIC(10,2) NOT NULL,
+    CONSTRAINT pk_desconto PRIMARY KEY (codigo_desconto)
+);
+
+
+CREATE TABLE Pacote (
+    codigo_pacote SMALLINT,
+    nome VARCHAR(100) NOT NULL,
+    preco NUMERIC(10,2) NOT NULL,
+    funcoes VARCHAR(255),
+    CONSTRAINT pk_pacote PRIMARY KEY (codigo_pacote)
+);
+
+
+CREATE TABLE Upgrade (
+    codigo_upgrade SMALLINT,
+    valor NUMERIC(10,2) NOT NULL,
+    beneficios VARCHAR(255),
+    CONSTRAINT pk_upgrade PRIMARY KEY (codigo_upgrade)
+);
+
+
+CREATE TABLE Conta_Usuario (
+    codigo_conta SMALLINT,
+    cpf VARCHAR(11) UNIQUE NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    telefone VARCHAR(15),
+    endereco VARCHAR(255),
+    data_nascimento DATE,
+    nome_usuario VARCHAR(50) NOT NULL,
+    senha VARCHAR(50) NOT NULL,
+    nome_conta VARCHAR(100),
+    codigo_premio SMALLINT,
+    CONSTRAINT pk_conta_usuario PRIMARY KEY (codigo_conta),
+    CONSTRAINT fk_conta_usuario_premio FOREIGN KEY (codigo_premio) REFERENCES Premio(codigo_premio)
+);
+
+
+CREATE TABLE Empresarial (
+    codigo_conta SMALLINT,
+    cnpj VARCHAR(14)  UNIQUE NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    codigo_pacote SMALLINT,
+    codigo_desconto SMALLINT,
+    CONSTRAINT pk_empresarial PRIMARY KEY (codigo_conta),
+    CONSTRAINT fk_empresarial_conta FOREIGN KEY (codigo_conta) REFERENCES Conta_Usuario(codigo_conta),
+    CONSTRAINT fk_empresarial_pacote FOREIGN KEY (codigo_pacote) REFERENCES Pacote(codigo_pacote),
+    CONSTRAINT fk_empresarial_desconto FOREIGN KEY (codigo_desconto) REFERENCES Desconto(codigo_desconto)
+);
+
+
+CREATE TABLE Pessoal (
+    codigo_conta SMALLINT,
+    nro_de_amigos SMALLINT DEFAULT 0,
+    CONSTRAINT pk_pessoal PRIMARY KEY (codigo_conta),
+    CONSTRAINT fk_pessoal_conta FOREIGN KEY (codigo_conta) REFERENCES Conta_Usuario(codigo_conta)
+);
+
+
+CREATE TABLE Grupo_de_Amigos (
+    codigo_grupo SMALLINT,
+    nome VARCHAR(100) NOT NULL,
+    descricao VARCHAR(255),
+    codigo_conta SMALLINT,
+    CONSTRAINT pk_grupo_amigos PRIMARY KEY (codigo_grupo),
+    CONSTRAINT fk_grupo_pessoal FOREIGN KEY (codigo_conta) REFERENCES Pessoal(codigo_conta)
+);
+
+
+CREATE TABLE Participa (
+    codigo_conta SMALLINT,
+    codigo_grupo SMALLINT,
+    CONSTRAINT pk_participa PRIMARY KEY (codigo_conta, codigo_grupo),
+    CONSTRAINT fk_participa_conta FOREIGN KEY (codigo_conta) REFERENCES Pessoal(codigo_conta),
+    CONSTRAINT fk_participa_grupo FOREIGN KEY (codigo_grupo) REFERENCES Grupo_de_Amigos(codigo_grupo)
+);
+
+
+CREATE TABLE Postagem (
+    codigo_postagem SMALLINT,
+    tipo VARCHAR(50) NOT NULL,
+    numero_curtidas SMALLINT DEFAULT 0,
+    data_postagem DATE,
+    codigo_conta SMALLINT,
+    CONSTRAINT pk_postagem PRIMARY KEY (codigo_postagem),
+    CONSTRAINT fk_postagem_conta FOREIGN KEY (codigo_conta) REFERENCES Conta_Usuario(codigo_conta)
+);
+
+
+CREATE TABLE Pagina (
+    codigo_conta SMALLINT,
+    nome VARCHAR(100) NOT NULL,
+    nro_de_visitas SMALLINT DEFAULT 0,
+    codigo_upgrade SMALLINT,
+    CONSTRAINT pk_pagina PRIMARY KEY (codigo_conta),
+    CONSTRAINT uq_pagina_conta_nome UNIQUE (codigo_conta, nome),
+    CONSTRAINT fk_pagina_conta FOREIGN KEY (codigo_conta) REFERENCES Conta_Usuario(codigo_conta),
+    CONSTRAINT fk_pagina_upgrade FOREIGN KEY (codigo_upgrade) REFERENCES Upgrade(codigo_upgrade)
+);
+
+
+
+CREATE TABLE Pagina_Propaganda (
+    codigo_conta SMALLINT,
+    nome VARCHAR(100),
+    taxa_rejeicao NUMERIC(5,2),
+    taxa_conversao NUMERIC(5,2),
+    taxa_clique NUMERIC(5,2),
+    CONSTRAINT pk_pagina_propaganda PRIMARY KEY (codigo_conta, nome),
+    CONSTRAINT fk_pagina_propaganda FOREIGN KEY (codigo_conta, nome) REFERENCES Pagina(codigo_conta, nome)
+);
+
+
+CREATE TABLE Visivel (
+    codigo_grupo SMALLINT,
+    codigo_conta SMALLINT,
+    nome VARCHAR(100),
+    CONSTRAINT pk_visivel PRIMARY KEY (codigo_grupo, codigo_conta, nome),
+    CONSTRAINT fk_visivel_grupo FOREIGN KEY (codigo_grupo) REFERENCES Grupo_de_Amigos(codigo_grupo),
+    CONSTRAINT fk_visivel_pagina FOREIGN KEY (codigo_conta, nome) REFERENCES Pagina(codigo_conta, nome)
+);
+
+
+CREATE TABLE Amizade (
+    codigo_amizade SMALLINT,
+    codigo_amigo SMALLINT,
+    status VARCHAR(20),
+    CONSTRAINT pk_amizade PRIMARY KEY (codigo_amizade, codigo_amigo),
+    CONSTRAINT fk_amizade_conta1 FOREIGN KEY (codigo_amizade) REFERENCES Conta_Usuario(codigo_conta),
+    CONSTRAINT fk_amizade_conta2 FOREIGN KEY (codigo_amigo) REFERENCES Conta_Usuario(codigo_conta)
+);
+
+
+CREATE TABLE Acao (
+    codigo_acao SMALLINT,
+    descricao VARCHAR(255) NOT NULL,
+    CONSTRAINT pk_acao PRIMARY KEY (codigo_acao)
+);
+
+INSERT INTO Premio VALUES
+(1, 'Top Contribuidor', '2024-01-10'),
+(2, 'Amigo do Ano', '2024-02-15'),
+(3, 'Criador Criativo', '2024-03-12'),
+(4, 'Inovador', '2024-04-01'),
+(5, 'Social Butterfly', '2024-05-20'),
+(6, 'Empreendedor Destaque', '2024-06-10'),
+(7, 'Influencer Pro', '2024-07-11'),
+(8, 'Conectado', '2024-08-09'),
+(9, 'Veterano', '2024-09-25'),
+(10, 'Bem Avaliado', '2024-10-05');
+
+INSERT INTO Desconto VALUES
+(1, 10.00), (2, 15.00), (3, 20.00), (4, 5.00), (5, 25.00),
+(6, 12.50), (7, 30.00), (8, 8.75), (9, 18.00), (10, 22.22);
+
+INSERT INTO Pacote VALUES
+(1, 'Básico', 99.90, 'Funções básicas de publicação'),
+(2, 'Intermediário', 199.90, 'Funções básicas + análise'),
+(3, 'Avançado', 299.90, 'Análise + segmentação de público'),
+(4, 'Premium', 399.90, 'Tudo incluso + automação'),
+(5, 'Startup', 79.90, 'Ideal para pequenas empresas'),
+(6, 'Creator', 159.90, 'Funções para criadores'),
+(7, 'Negócio Local', 129.90, 'Para comércios locais'),
+(8, 'Empreendedor', 189.00, 'Funções e relatórios'),
+(9, 'Influencer Pack', 250.00, 'Análises e alcance'),
+(10, 'Max Pro', 499.90, 'Tudo incluso + suporte dedicado');
+
+INSERT INTO Upgrade VALUES
+(1, 49.90, 'Melhoria de desempenho de página'),
+(2, 29.90, 'Aumento no limite de postagens'),
+(3, 59.90, 'Ferramentas de análise'),
+(4, 89.90, 'Acesso a publicidade premium'),
+(5, 99.90, 'Automação de conteúdo'),
+(6, 39.90, 'Design customizado'),
+(7, 69.90, 'Interação com IA'),
+(8, 45.00, 'Melhoria de visibilidade'),
+(9, 55.55, 'Relatórios detalhados'),
+(10, 35.35, 'Upgrade visual completo');
+
+INSERT INTO Conta_Usuario VALUES
+(1, '11111111111', 'Alice Silva', 'alice@email.com', '11999990001', 'Rua A, 123', '1995-06-10', 'alice123', 'senha1', 'Conta Alice', 1),
+(2, '22222222222', 'Bruno Souza', 'bruno@email.com', '11999990002', 'Rua B, 456', '1994-04-12', 'bruno_s', 'senha2', 'Conta Bruno', 2),
+(3, '33333333333', 'Carlos Lima', 'carlos@email.com', '11999990003', 'Rua C, 789', '1993-02-15', 'carlosl', 'senha3', 'Conta Carlos', 3),
+(4, '44444444444', 'Daniela Costa', 'daniela@email.com', '11999990004', 'Rua D, 101', '1992-08-08', 'danidc', 'senha4', 'Conta Daniela', 4),
+(5, '55555555555', 'Eduardo Ribeiro', 'edu@email.com', '11999990005', 'Rua E, 202', '1990-01-01', 'edur', 'senha5', 'Conta Eduardo', 5),
+(6, '66666666666', 'Fernanda Torres', 'fernanda@email.com', '11999990006', 'Rua F, 303', '1991-03-03', 'ferna_t', 'senha6', 'Conta Fernanda', 6);
+
+INSERT INTO Conta_Usuario VALUES
+(7, '77777777777', 'Gourmet Burgers', 'gourmet@email.com', '11333330001', 'Av. Comercial, 45', '1985-05-05', 'gourmet_b', 'senha7', 'Conta Gourmet', 7),
+(8, '88888888888', 'TechNova', 'technova@email.com', '11333330002', 'Rua Tech, 1010', '1980-10-10', 'technova', 'senha8', 'Conta TechNova', 8),
+(9, '99999999999', 'Mundo Pet', 'mundopet@email.com', '11333330003', 'Rua Pet, 2020', '1983-07-07', 'mundopet', 'senha9', 'Conta Pet', 9),
+(10, '10101010101', 'Studio Fit', 'studiofit@email.com', '11333330004', 'Av. Fitness, 3030', '1988-09-09', 'studiofit', 'senha10', 'Conta Fit', 10);
+
+INSERT INTO Empresarial VALUES
+(7, '12345678000100', 'Gourmet Burgers Ltda', 1, 1),
+(8, '23456789000111', 'TechNova Soluções', 2, 2),
+(9, '34567890000122', 'Mundo Pet LTDA', 3, 3),
+(10, '45678900000133', 'Studio Fit Treinamentos', 4, 4);
+
+INSERT INTO Pessoal VALUES
+(1, 3),
+(2, 2),
+(3, 1),
+(4, 3),
+(5, 1),
+(6, 2);
+
+INSERT INTO Grupo_de_Amigos VALUES
+(1, 'Família', 'Parentes próximos', 1),
+(2, 'Trabalho', 'Colegas de trabalho', 1),
+(3, 'Academia', 'Amigos da academia', 2),
+(4, 'Viagens', 'Companheiros de viagem', 3),
+(5, 'Jogos', 'Amigos de jogos online', 4),
+(6, 'Faculdade', 'Turma da facul', 5),
+(7, 'Cinema', 'Grupo do cinema', 6),
+(8, 'Corrida', 'Pessoal das corridas', 1),
+(9, 'Livro', 'Clube do livro', 2),
+(10, 'Música', 'Amigos músicos', 3);
+
+INSERT INTO Participa VALUES
+(2, 1),
+(3, 1),
+(4, 2),
+(5, 2),
+(1, 3),
+(6, 3),
+(1, 8),
+(2, 9),
+(3, 10),
+(4, 5);
+
+INSERT INTO Postagem VALUES
+(1, 'Texto', 10, '2025-01-01', 1),
+(2, 'Imagem', 20, '2025-01-02', 2),
+(3, 'Vídeo', 5, '2025-01-03', 3),
+(4, 'Texto', 15, '2025-01-04', 4),
+(5, 'Imagem', 7, '2025-01-05', 5),
+(6, 'Texto', 12, '2025-01-06', 6),
+(7, 'Imagem', 8, '2025-01-07', 1),
+(8, 'Vídeo', 9, '2025-01-08', 2),
+(9, 'Texto', 11, '2025-01-09', 3),
+(10, 'Imagem', 13, '2025-01-10', 4);
+
+INSERT INTO Pagina VALUES
+(1, 'Página da Alice', 100, 1),
+(2, 'Blog do Bruno', 150, 2),
+(3, 'Carlos Fala', 200, 3),
+(4, 'Diário da Dani', 120, 4),
+(5, 'EduTech', 300, 4),
+(6, 'FêNews', 210, 2),
+(7, 'Gourmet Oficial', 500, 1),
+(8, 'TechNova Blog', 450, 2),
+(9, 'Pet Lovers', 430, 3),
+(10, 'Studio Fit Pro', 390, 5);
+
+INSERT INTO Pagina_Propaganda VALUES
+(7, 'Gourmet Oficial', 12.5, 4.2, 15.6),
+(8, 'TechNova Blog', 9.0, 6.7, 20.1),
+(9, 'Pet Lovers', 10.0, 5.5, 18.3),
+(10, 'Studio Fit Pro', 8.5, 7.8, 22.0);
+
+INSERT INTO Visivel VALUES
+(1, 1, 'Página da Alice'),
+(2, 1, 'Página da Alice'),
+(3, 2, 'Blog do Bruno'),
+(9, 2, 'Blog do Bruno'),
+(10, 3, 'Carlos Fala');
+
+INSERT INTO Amizade VALUES
+(1, 2, 'aceita'),
+(1, 3, 'aceita'),
+(2, 3, 'pendente'),
+(4, 5, 'aceita'),
+(5, 6, 'aceita'),
+(3, 6, 'aceita'),
+(2, 4, 'recusada'),
+(1, 6, 'aceita'),
+(6, 4, 'pendente'),
+(3, 5, 'aceita');
+
+INSERT INTO Acao VALUES
+(1, 'Postar no mural'),
+(2, 'Comentar'),
+(3, 'Curtir postagem'),
+(4, 'Compartilhar conteúdo'),
+(5, 'Atualizar página'),
+(6, 'Convidar amigo'),
+(7, 'Responder comentário'),
+(8, 'Criar grupo'),
+(9, 'Denunciar postagem'),
+(10, 'Editar perfil');
+
+
